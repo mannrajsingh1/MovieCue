@@ -1,10 +1,13 @@
 package com.moviereco.movie_recommender.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import com.moviereco.movie_recommender.dto.OmdbMovieResponse;
+import com.moviereco.movie_recommender.dto.OmdbSearchResponse;
 import com.moviereco.movie_recommender.model.Movie;
 
 @Service
@@ -48,7 +51,6 @@ public class OmdbService {
         return movie;
     }
 
-
     private int parseIntSafely(String year) {
         try {
             return Integer.parseInt(year);
@@ -63,5 +65,34 @@ public class OmdbService {
         } catch (NumberFormatException e) {
             return 0.0;
         }
+    }
+
+    public List<OmdbSearchResponse.OmdbSearchResult> searchMovies(String keyword) {
+        OmdbSearchResponse response = restClient.get().uri(uriBuilder -> uriBuilder
+                .queryParam("apikey", apiKey)
+                .queryParam("s", keyword)
+                .build())
+            .retrieve()
+            .body(OmdbSearchResponse.class);
+
+        if (response == null || "False".equals(response.getResponse()) || response.getSearch() == null) {
+            throw new RuntimeException("No search results found on OMDB for: " + keyword);
+        }
+
+        return response.getSearch();
+    }
+    
+    public Movie fetchMovieByImdbId(String imdbId) {
+        OmdbMovieResponse response = restClient.get().uri(uriBuilder -> uriBuilder
+                .queryParam("apikey", apiKey)
+                .queryParam("i", imdbId)
+                .build())
+            .retrieve()
+            .body(OmdbMovieResponse.class);
+
+        if (response == null || "False".equals(response.getResponse())) {
+            throw new RuntimeException("No search results found on OMDB for IMDb ID: " + imdbId);
+        }
+        return convertToMovie(response);
     }
 }

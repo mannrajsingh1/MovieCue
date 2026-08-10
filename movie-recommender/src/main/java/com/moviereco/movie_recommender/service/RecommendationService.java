@@ -8,12 +8,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import com.moviereco.movie_recommender.dto.OmdbSearchResponse;
 import com.moviereco.movie_recommender.model.Movie;
 import com.moviereco.movie_recommender.model.Rating;
 import com.moviereco.movie_recommender.repository.RatingRepository;
 
+@Service
 public class RecommendationService {
     private final RatingRepository ratingRepository;
     private final OmdbService omdbService;
@@ -22,7 +24,7 @@ public class RecommendationService {
     private final double actorWeight;
     private final double directorWeight;
 
-    public RecommendationService(RatingRepository ratingRepository, OmdbService omdbService, @Value("${recommendation.genre.weight}") double genreWeight, @Value("${recommendation.actor.weight}") double actorWeight, @Value("${recommendation.director.weight}") double directorWeight) {
+    public RecommendationService(RatingRepository ratingRepository, OmdbService omdbService, @Value("${recommendation.weight.genre}") double genreWeight, @Value("${recommendation.weight.actor}") double actorWeight, @Value("${recommendation.weight.director}") double directorWeight) {
         this.ratingRepository = ratingRepository;
         this.omdbService = omdbService;
         this.genreWeight = genreWeight;

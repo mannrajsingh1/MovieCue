@@ -25,6 +25,10 @@ public class RecommendationController {
     public List<RecommendationService.ScoredMovie> getRecommendations(@RequestParam String keyword, @RequestParam(defaultValue = "7") int limit) {
         return recommendationService.recommend(keyword, limit);
     }
-    
+
+    @GetMapping("/for-me")
+    public List<RecommendationService.ScoredMovie> getPersonalizedRecommendations(@RequestParam(defaultValue = "5") int limit) {
+        return recommendationService.recommend(limit);
+    }
     
 }

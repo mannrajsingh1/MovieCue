@@ -32,11 +32,22 @@ public class TmdbMovieCreditsResponse {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TmdbCredit {
+
+        @JsonProperty("id")
+        private Long id;
+
         @JsonProperty("title")
         private String title;
 
         @JsonProperty("job")
         private String job;
+
+        public Long getId() {
+            return id;
+        }
+        public void setId(Long id) {
+            this.id = id;
+        }
 
         public String getTitle() {
             return title;

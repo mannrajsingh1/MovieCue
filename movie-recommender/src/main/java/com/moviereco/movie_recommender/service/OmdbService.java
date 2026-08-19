@@ -76,7 +76,7 @@ public class OmdbService {
             .body(OmdbSearchResponse.class);
 
         if (response == null || "False".equals(response.getResponse()) || response.getSearch() == null) {
-            throw new RuntimeException("No search results found on OMDB for: " + keyword);
+            return List.of();
         }
 
         return response.getSearch();

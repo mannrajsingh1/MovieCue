@@ -1,24 +1,36 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import SearchMovie from './components/SearchMovie';
+import MyMovies from './components/MyMovies';
+import Recommendations from './components/Recommendations';
 
 function App() {
-  const [movies, setMovies] = useState([]);
-  const [error, setError] = useState(null)
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  useEffect(() => {
-    fetch('http://localhost:8080/api/movies')
-    .then((res) => res.json())
-    .then((data) => setMovies(data))
-    .catch((err) => setError(err.message));
-  }, []);
-
+  function handleMovieRated() {
+    setRefreshTrigger((prev) => prev + 1);
+  }
 
   return (
-    <div>
+    <div style = {{ maxWidth: '700px', margin: '0 auto', padding: '20px', fontFamily: 'sans-serif' }}>
       <h1>
-        MovieCue - Connection Test
+        MovieCue
       </h1>
-      {error && <p style = {{ color: 'red '}}>Error: {error}</p>}
-      <pre> {JSON.stringify(movies,null,2)}</pre>
+
+      <section>
+        <h2> Find a Movie </h2>
+        <SearchMovie onMovieRated={handleMovieRated} />
+      </section>
+
+      <section>
+          <h2> My Rated Movies</h2>
+          <MyMovies refreshTrigger={refreshTrigger} />
+      </section>
+
+      <section>
+        <h2> Recommended For You </h2>
+        <Recommendations />
+      </section>
+
     </div>
   );
 }

@@ -38,3 +38,7 @@ out/
 application-local.properties
 *.env
 .env
+
+# Frontend (moviecue-frontend)
+moviecue-frontend/node_modules/
+moviecue-frontend/dist/

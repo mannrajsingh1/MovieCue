@@ -4,12 +4,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.moviereco.movie_recommender.service.RatingService;
+import com.moviereco.movie_recommender.service.VisitorService;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import com.moviereco.movie_recommender.model.Rating;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -33,24 +36,20 @@ public class RatingController {
     }
 
     @GetMapping
-    public List<Rating> getAllRatings() {
-        return ratingService.getAllRatings();
+    public List<Rating> getMyRatings(@RequestHeader("X-Visitor-Id") String visitorKey) {
+        return ratingService.getRatingsFor(visitorKey);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Rating rateMovie(@RequestParam Long movieId, @RequestParam double score) {
-        return ratingService.rateMovie(movieId, score);
+    public Rating rateMovie(@RequestHeader("X-Visitor-Id") String visitorKey, @RequestParam Long movieId, @RequestParam double score) {
+        return ratingService.rateMovie(visitorKey, movieId, score);
     }
     
     @DeleteMapping("/{ratingId}")
-    public void deleteRating(@PathVariable Long ratingId) {
-        ratingService.deleteRating(ratingId);
-    }
-
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<String> handleNoSuchElementException(NoSuchElementException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteRating(@RequestHeader("X-Visitor-Id") String visitorKey, @PathVariable Long ratingId) {
+        ratingService.deleteRating(visitorKey, ratingId);
     }
 
 

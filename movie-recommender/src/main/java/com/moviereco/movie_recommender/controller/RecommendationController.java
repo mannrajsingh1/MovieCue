@@ -8,6 +8,7 @@ import com.moviereco.movie_recommender.service.RecommendationService;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -22,13 +23,16 @@ public class RecommendationController {
     }
 
     @GetMapping
-    public List<RecommendationService.ScoredMovie> getRecommendations(@RequestParam String keyword, @RequestParam(defaultValue = "7") int limit) {
-        return recommendationService.recommend(keyword, limit);
+    public List<RecommendationService.ScoredMovie> getRecommendations(@RequestHeader("X-Visitor-Id") String visitorKey, @RequestParam String keyword, @RequestParam(defaultValue = "7") int limit) {
+        return recommendationService.recommend(visitorKey, keyword, limit);
     }
 
     @GetMapping("/for-me")
-    public List<RecommendationService.ScoredMovie> getPersonalizedRecommendations(@RequestParam(defaultValue = "5") int limit) {
-        return recommendationService.recommend(limit);
+    public List<RecommendationService.ScoredMovie> getPersonalizedRecommendations(@RequestHeader("X-Visitor-Id") String visitorKey, @RequestParam(defaultValue = "5") int limit) {
+        return recommendationService.recommend(visitorKey, clamp(limit));
     }
     
+    private int clamp(int limit) {
+        return Math.max(1, Math.min(limit, 10));
+    }
 }

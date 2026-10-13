@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.moviereco.movie_recommender.model.Movie;
 import com.moviereco.movie_recommender.service.MovieService;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,14 +19,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import com.moviereco.movie_recommender.service.OmdbService;
+import com.moviereco.movie_recommender.service.VisitorService;
 
 
-
+@CrossOrigin(origins = "http://localhost:5174")
 @RestController
 @RequestMapping("/api/movies")
 public class MovieController {
@@ -37,37 +39,19 @@ public class MovieController {
         this.omdbService = omdbService;
     }
 
-    @GetMapping
-    public List<Movie> getAllMovies() {
-        return movieService.getMovies();
-    }
-
     @GetMapping("/{id}")
     public Movie getMovie(@PathVariable Long id) {
         return movieService.getMovieById(id);
     }
 
     @GetMapping("/search")
-    public Movie searchMovie(@RequestParam String title) {
+    public Movie searchMovie(@RequestHeader("X-Visitor-Id") String visitorKey, @RequestParam String title) {
+        VisitorService.validateKey(visitorKey);
+        if (title.isBlank() || title.length() > 100) {
+            throw new IllegalArgumentException("Title must be between 1 and 100 characters");
+        }
         Movie movie = omdbService.fetchMovieByTitle(title);
-        return movieService.saveMovie(movie);
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Movie createMovie(@RequestBody Movie movie) {
-        return movieService.saveMovie(movie);
-    }
-
-    @DeleteMapping
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteMovie(@RequestParam Long id) {
-        movieService.deleteMovie(id);
-    }
-    
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Map<String, String>> handleNoSuchElementException(NoSuchElementException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        return movieService.findOrCreate(movie);
     }
     
 

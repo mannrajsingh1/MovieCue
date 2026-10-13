@@ -1,6 +1,7 @@
 package com.moviereco.movie_recommender.service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class OmdbService {
             .body(OmdbMovieResponse.class);
 
             if (response == null || response.getTitle() == null) {
-                throw new RuntimeException("Movie not found on OMDB: " + title);
+                throw new NoSuchElementException("Movie not found on OMDB: " + title);
             }
         return convertToMovie(response);
     }

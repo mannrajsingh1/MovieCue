@@ -3,7 +3,8 @@ package com.moviereco.movie_recommender.model;
 import jakarta.persistence.*;
 import java.time.*;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
 @Table(name = "Ratings")
@@ -13,9 +14,13 @@ public class Rating {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "visitor_id")
+    @JsonIgnore
+    private Visitor visitor;
+
     @ManyToOne
     @JoinColumn(name = "movie_id")
-    @JsonBackReference
     private Movie movie;
 
     private double rating;
@@ -43,11 +48,22 @@ public class Rating {
     public double getRating() {
         return rating;
     }
+    public void setRating(double rating){
+        this.rating = rating;
+    }
     public LocalDate getDateRated() {
         return dateRated;
     }
     public void setDateRated(LocalDate dateRated) {
         this.dateRated = dateRated;
+    }
+
+    public Visitor getVisitor() {
+        return visitor;
+    }
+
+    public void setVisitor(Visitor visitor) {
+        this.visitor = visitor;
     }
 
 }

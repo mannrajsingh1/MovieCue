@@ -40,9 +40,9 @@ public class RecommendationService {
         this.directorWeight = directorWeight;
     }
 
-    public List<ScoredMovie> recommend(String keyword, int limit) {
+    public List<ScoredMovie> recommend(String visitorKey, String keyword, int limit) {
 
-        List<Rating> userRatings = ratingRepository.findAll();
+        List<Rating> userRatings = requireRatings(visitorKey);
 
         if (userRatings.isEmpty()) {
             throw new EmptyRatingsException("No ratings found for the user. Please rate some movies first.");
@@ -65,8 +65,8 @@ public class RecommendationService {
         return scoredMovies.stream().limit(limit).toList();
     }
 
-    public List<ScoredMovie> recommend(int limit) {
-        List<Rating> userRatings = requireRatings();
+    public List<ScoredMovie> recommend(String visitorKey, int limit) {
+        List<Rating> userRatings = requireRatings(visitorKey);
 
         Set<String> peopleNames = derivePeopleFromRatings(userRatings);
 
@@ -104,8 +104,9 @@ public class RecommendationService {
         return scoredMovies.stream().distinct().limit(limit).toList();
     }
 
-    private List<Rating> requireRatings() {
-        List<Rating> userRatings = ratingRepository.findAll();
+    private List<Rating> requireRatings(String visitorKey) {
+        VisitorService.validateKey(visitorKey);
+        List<Rating> userRatings = ratingRepository.findByVisitor_VisitorKey(visitorKey);
         if (userRatings.isEmpty()) {
             throw new IllegalStateException("Rate atleast one movie to get recommendations.");
         }

@@ -3,7 +3,7 @@ package com.moviereco.movie_recommender.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 
@@ -35,7 +35,7 @@ public class Movie {
     private double imdbRating;
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonIgnore
     private List<Rating> ratings = new ArrayList<>();
 
     private String posterUrl;

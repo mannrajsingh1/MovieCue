@@ -1,22 +1,31 @@
 import { useState, useEffect } from 'react'
-import { getAllMovies } from '../api/movieApi'
+import { getMyRatings, deleteRating } from '../api/movieApi'
 
 function MyMovies({ refreshTrigger }) {
-    const [movies, setMovies] = useState([]);
+    const [ratings, setRatings] = useState([]);
     const [status, setStatus] = useState('')
 
     useEffect(() => {
-        loadMovies();
+        loadRatings();
     }, [refreshTrigger]);
 
-    async function loadMovies() {
+    async function loadRatings() {
         setStatus('Loading...');
 
         try {
-            const data = await getAllMovies();
-            setMovies(data);
+            const data = await getMyRatings();
+            setRatings(data);
             setStatus('');
         } catch (e) {
+            setStatus(`Error: ${e.message}`);
+        }
+    }
+
+    async function handleRemove(ratingId) {
+        try {
+            await deleteRating(ratingId);
+            setRatings((prev) => prev.filter((r) => r.id !== ratingId));
+        } catch(e) {
             setStatus(`Error: ${e.message}`);
         }
     }
@@ -24,16 +33,12 @@ function MyMovies({ refreshTrigger }) {
     return (
         <div>
             {status && <p> {status}</p>}
-            {movies.length === 0 && !status && <p> No movies yet - search for one above.</p>}
+            {ratings.length === 0 && !status && <p> No ratings yet - search for a movie above.</p>}
             <ul>
-                {movies.map((movie) => (
-                    <li key={movie.id}>
-                        <strong>{movie.title}</strong> ({movie.year})
-                        {movie.ratings && movie.ratings.length>0 ? (
-                            <span> - rated {movie.ratings[movie.ratings.length - 1].rating}/10</span>
-                        ) : (
-                            <span> - not rated yet </span>
-                        )}
+                {ratings.map((rating) => (
+                    <li key={rating.id}>
+                        <strong>{rating.movie.title}</strong> ({rating.movie.year}) - rated {rating.rating}/10{' '}
+                        <button onClick={() => handleRemove(rating.id)}>Remove</button>
                     </li>
                 ))}
             </ul>

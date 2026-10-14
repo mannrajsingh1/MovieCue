@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import SearchMovie from './components/SearchMovie';
 import MyMovies from './components/MyMovies';
 import Recommendations from './components/Recommendations';

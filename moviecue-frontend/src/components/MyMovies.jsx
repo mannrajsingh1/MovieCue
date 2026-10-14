@@ -37,6 +37,8 @@ function MyMovies({ refreshTrigger }) {
             <ul>
                 {ratings.map((rating) => (
                     <li key={rating.id}>
+                        <h3> {rating.movie.title} ({rating.movie.year})</h3>
+                        <img src = {rating.movie.posterUrl} alt={rating.movie.title} width = "120" />
                         <strong>{rating.movie.title}</strong> ({rating.movie.year}) - rated {rating.rating}/10{' '}
                         <button onClick={() => handleRemove(rating.id)}>Remove</button>
                     </li>
